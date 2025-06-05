@@ -16,6 +16,7 @@ base_url = "https://arxiv.paperswithcode.com/api/v0/papers/"
 github_url = "https://api.github.com/search/repositories"
 arxiv_url = "http://arxiv.org/"
 
+
 def write_today_md(daily_data, filename):
     """将当天增量数据写入today.md"""
     DateNow = datetime.date.today().strftime("%Y.%m.%d")
@@ -40,6 +41,7 @@ def write_today_md(daily_data, filename):
             f.write("\n")
     
     logging.info(f"增量数据已写入 {filename}")
+  
 
 def load_config(config_file:str) -> dict:
     '''
