@@ -71,4 +71,4 @@ jobs:
           body: file://email.html
           to: 642835027@qq.com
           from: GitHub Actions for TTS Arxiv Daily
-          content_type: text/plain
+          content_type: text/html
