@@ -18,7 +18,7 @@ arxiv_url = "http://arxiv.org/"
 
 
 def write_today_md(daily_data, filename):
-    """将当天增量数据写入today.md"""
+    """将当天增量数据写入today.md，优化为单篇文章分行展示格式"""
     DateNow = datetime.date.today().strftime("%Y.%m.%d")
     
     with open(filename, "w") as f:
@@ -31,14 +31,29 @@ def write_today_md(daily_data, filename):
                 continue
                 
             f.write(f"## {topic}\n\n")
-            f.write("| 发布日期 | 标题 | 作者 | PDF | 代码 |\n")
-            f.write("|---------|------|------|-----|------|\n")
             
             # 按日期排序
             sorted_papers = sort_papers(papers)
             for _, content in sorted_papers.items():
-                f.write(content)
-            f.write("\n")
+                # 解析表格行内容
+                parts = content.strip().split("|")
+                if len(parts) >= 6:  # 确保格式正确
+                    date = parts[1].replace("**", "").strip()
+                    title = parts[2].replace("**", "").strip()
+                    authors = parts[3].replace("et.al.", "et al.").strip()
+                    pdf = parts[4].strip()
+                    code = parts[5].replace("**", "").strip()
+                    
+                    # 写入优化后的格式
+                    f.write(f"日期：{date}\n")
+                    f.write(f"标题：{title}\n")
+                    f.write(f"作者：{authors}\n")
+                    f.write(f"链接：{pdf}\n")
+                    f.write(f"代码：{code}\n\n")  # 空行分隔不同文章
+                else:
+                    logging.warning(f"格式异常的内容: {content}")
+            
+            f.write("\n")  # 主题间空行分隔
     
     logging.info(f"增量数据已写入 {filename}")
   
