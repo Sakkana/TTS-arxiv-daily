@@ -39,7 +39,7 @@ def write_today_md(daily_data, filename):
                 f.write(content)
             f.write("\n")
     
-    logging.info(f"增量数据已写入 {md_filename}")
+    logging.info(f"增量数据已写入 {filename}")
 
 def load_config(config_file:str) -> dict:
     '''
