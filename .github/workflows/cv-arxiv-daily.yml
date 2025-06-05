@@ -43,10 +43,12 @@ jobs:
           pip install arxiv
           pip install requests
           pip install pyyaml
+          pip install markdown
           
       - name: Run daily arxiv 
         run: |
           python daily_arxiv.py
+          python -c "import markdown; print(markdown.markdown(open('README.md').read()))" > email.html
           
       - name: Push new cv-arxiv-daily.md
         uses: github-actions-x/commit@v2.9
@@ -57,3 +59,16 @@ jobs:
           rebase: 'true'
           name: ${{ env.GITHUB_USER_NAME }}
           email: ${{ env.GITHUB_USER_EMAIL }}
+
+      - name: 'Send mail'
+        uses: dawidd6/action-send-mail@master
+        with:
+          server_address: smtp.qq.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: 🐸 ArXiv TTS Paper Daily
+          body: file://email.html
+          to: 642835027@qq.com
+          from: GitHub Actions for TTS Arxiv Daily
+          content_type: text/plain
