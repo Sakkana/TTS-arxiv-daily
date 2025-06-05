@@ -16,6 +16,31 @@ base_url = "https://arxiv.paperswithcode.com/api/v0/papers/"
 github_url = "https://api.github.com/search/repositories"
 arxiv_url = "http://arxiv.org/"
 
+def write_today_md(daily_data, filename):
+    """将当天增量数据写入today.md"""
+    DateNow = datetime.date.today().strftime("%Y.%m.%d")
+    
+    with open(filename, "w") as f:
+        f.write(f"# 今日新增论文 ({DateNow})\n\n")
+        f.write("> 自动收集的最新学术论文增量更新\n\n")
+        
+        for topic in daily_data.keys():
+            papers = daily_data[topic]
+            if not papers:
+                continue
+                
+            f.write(f"## {topic}\n\n")
+            f.write("| 发布日期 | 标题 | 作者 | PDF | 代码 |\n")
+            f.write("|---------|------|------|-----|------|\n")
+            
+            # 按日期排序
+            sorted_papers = sort_papers(papers)
+            for _, content in sorted_papers.items():
+                f.write(content)
+            f.write("\n")
+    
+    logging.info(f"增量数据已写入 {md_filename}")
+
 def load_config(config_file:str) -> dict:
     '''
     config_file: input config file path
@@ -384,6 +409,8 @@ def demo(**config):
     logging.info(f'Update Paper Link = {b_update}')
     if config['update_paper_links'] == False:
         logging.info(f"GET daily papers begin")
+        daily_data = {}  # 存储当天新增的所有论文数据
+        daily_data_web = {}
         for topic, keyword in keywords.items():
             logging.info(f"Keyword: {topic}")
             data, data_web = get_daily_papers(topic, query = keyword,
@@ -391,6 +418,11 @@ def demo(**config):
             data_collector.append(data)
             data_collector_web.append(data_web)
             print("\n")
+
+            # 额外存储当天数据
+            daily_data[topic] = data[topic]  
+            daily_data_web[topic] = data_web[topic]
+            write_today_md(daily_data, 'today.md')
         logging.info(f"GET daily papers end")
 
     # 1. update README.md file
